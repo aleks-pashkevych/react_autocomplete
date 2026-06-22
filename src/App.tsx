@@ -11,14 +11,15 @@ export const App: React.FC = () => {
   const [appliedQuery, setAppliedQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const debounceValue = 300;
 
   const applyQuery = useMemo(
-    () => debounce(setAppliedQuery, 300),
+    () => debounce(setAppliedQuery, debounceValue),
     [setAppliedQuery],
   );
 
   const filteredPerson = useMemo(() => {
-    if (appliedQuery) {
+    if (appliedQuery.trim().length > 0) {
       return peopleFromServer.filter(person =>
         person.name.toLowerCase().includes(appliedQuery.toLowerCase().trim()),
       );
@@ -28,8 +29,10 @@ export const App: React.FC = () => {
   }, [appliedQuery]);
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(event.target.value);
-    applyQuery(event.target.value);
+    const value = event.target.value.trim();
+
+    setQuery(value);
+    applyQuery(value);
     setSelectedPerson(null);
   };
 
