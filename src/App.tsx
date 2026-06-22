@@ -3,8 +3,9 @@ import debounce from 'lodash.debounce';
 import './App.scss';
 import { peopleFromServer } from './data/people';
 import { Person } from './types/Person';
-//eslint-disable-next-line
-import classNames from 'classnames';
+
+import { Dropdown } from './components/Dropdown';
+import { User } from './components/User';
 
 export const App: React.FC = () => {
   const [query, setQuery] = useState('');
@@ -42,66 +43,24 @@ export const App: React.FC = () => {
     setIsFocused(false);
   };
 
+  const setFocused = (val: boolean) => {
+    setIsFocused(val);
+  };
+
   return (
     <div className="container">
       <main className="section is-flex is-flex-direction-column">
-        <h1 className="title" data-cy="title">
-          {selectedPerson
-            ? `${selectedPerson.name} (${selectedPerson.born} - ${selectedPerson.died})`
-            : 'No selected person'}
-        </h1>
+        <User selectedPerson={selectedPerson} />
 
-        <div
-          className={classNames('dropdown', {
-            'is-active': isFocused,
-          })}
-        >
-          <div className="dropdown-trigger">
-            <input
-              type="text"
-              placeholder="Enter a part of the name"
-              className="input"
-              data-cy="search-input"
-              value={query}
-              onChange={handleInput}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
-          </div>
-          <div className="dropdown-menu" role="menu" data-cy="suggestions-list">
-            <div className="dropdown-content">
-              {filteredPerson.length > 0 ? (
-                filteredPerson.map(person => (
-                  <div
-                    className="dropdown-item"
-                    data-cy="suggestion-item"
-                    key={person.slug}
-                    onMouseDown={() => handleSuggest(person)}
-                  >
-                    <p
-                      className={
-                        person.sex === 'm' ? 'has-text-link' : 'has-text-danger'
-                      }
-                    >
-                      {person.name}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <div
-                  className="notification
-                    is-danger is-light
-                    mt-3
-                    is-align-self-flex-start"
-                  role="alert"
-                  data-cy="no-suggestions-message"
-                >
-                  <p className="has-text-danger">No matching suggestions</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <Dropdown
+          handleSuggest={handleSuggest}
+          filteredPerson={filteredPerson}
+          delay={debounceValue}
+          query={query}
+          isFocused={isFocused}
+          setFocused={setFocused}
+          handleInput={handleInput}
+        />
       </main>
     </div>
   );
